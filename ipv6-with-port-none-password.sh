@@ -11,10 +11,9 @@ gen64() {
 	}
 	echo "$1:$(ip64):$(ip64):$(ip64):$(ip64)"
 }
-
 install_3proxy() {
     echo "installing 3proxy"
-    URL="https://github.com/z3APA3A/3proxy/archive/3proxy-0.8.6.tar.gz"
+    URL="https://raw.githubusercontent.com/quayvlog/quayvlog/main/3proxy-3proxy-0.8.6.tar.gz"
     wget -qO- $URL | bsdtar -xvf-
     cd 3proxy-3proxy-0.8.6
     make -f Makefile.Linux
@@ -55,16 +54,13 @@ EOF
 upload_proxy() {
     local PASS=$(random)
     zip --password $PASS proxy.zip proxy.txt
-    mv proxy.zip /home/cloudfly/
-    URL="https://transfer.sh/proxy.zip"
+    URL=$(curl -s --upload-file proxy.zip https://file.io/proxy.zip)
 
     echo "Proxy is ready! Format IP:PORT:LOGIN:PASS"
     echo "Download zip archive from: ${URL}"
     echo "Password: ${PASS}"
-    echo "Proxy file is also saved in /home/cloudfly/proxy.zip"
 
 }
-
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
         echo "usr$(random)/pass$(random)/$IP4/$port/$(gen64 $IP6)"
@@ -82,7 +78,6 @@ gen_ifconfig() {
 $(awk -F "/" '{print "ifconfig eth0 inet6 add " $5 "/64"}' ${WORKDATA})
 EOF
 }
-
 echo "installing apps"
 yum -y install gcc net-tools bsdtar zip >/dev/null
 
